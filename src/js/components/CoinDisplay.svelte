@@ -2,22 +2,18 @@
   import { onMount } from 'svelte';
   import { getCoins } from '../utils';
 
-
   let coins;
-  
-  onMount(async() => {
+
+  onMount(async () => {
     coins = await getCoins();
   });
-
-
-
 </script>
 
 <div class="coinContainer">
   <!-- Coin Display Bar -->
   <div class="coinBar">
     <div class="coinInfo">
-      <img class="coinImg" src="/src/images/coin.webp" alt="Coin Icon" />
+      <img class="coinImg" src="/images/coin.webp" alt="Coin Icon" />
       <span class="coinAmount">{coins}</span>
     </div>
   </div>
