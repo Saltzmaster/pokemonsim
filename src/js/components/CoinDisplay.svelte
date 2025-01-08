@@ -2,10 +2,10 @@
   import { onMount } from 'svelte';
   import { getCoins } from '../utils';
 
-  let coins;
+  let coins = 0; // Default to 0 coins if no data is available
 
   onMount(async () => {
-    coins = await getCoins();
+    coins = await getCoins(); // Fetch the coins from Supabase
   });
 </script>
 
@@ -14,7 +14,8 @@
   <div class="coinBar">
     <div class="coinInfo">
       <img class="coinImg" src="/images/coin.webp" alt="Coin Icon" />
-      <span class="coinAmount">{coins}</span>
+      <!-- Only display coins if they are set (i.e., not 0) -->
+      <span class="coinAmount">{coins !== null ? coins : 0}</span>
     </div>
   </div>
 </div>

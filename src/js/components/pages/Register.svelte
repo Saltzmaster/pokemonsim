@@ -1,11 +1,12 @@
 <script>
   import { supabase } from '../../../lib/supabase';
   import { writable } from 'svelte/store';
-  import { addRandomPokemonsToOwned } from '../../utils'
+  import { addRandomPokemonsToOwned } from '../../utils';
 
   let firstName = writable('');
   let lastName = writable('');
-  let username = writable('');
+  let email = writable('');
+  let username = writable(''); // optional for login
   let password = writable('');
 
   let errorMessage = writable('');
@@ -17,33 +18,45 @@
 
     const fName = $firstName;
     const lName = $lastName;
+    const userEmail = $email;
     const userName = $username;
     const passWord = $password;
 
-    if (!fName || !lName || !userName || !passWord) {
+    if (!fName || !lName || !userEmail || !userName || !passWord) {
       errorMessage.set('Please fill in all fields');
       return;
     }
 
     try {
-      const { data, error } = await supabase.from('users').insert([
-        {
-          first_name: fName,
-          last_name: lName,
-          username: userName,
-          password: passWord,
-          coins: 100,
-        },
-      ]).select('id');
+      const { data, error } = await supabase
+        .from('users')
+        .insert([
+          {
+            first_name: fName,
+            last_name: lName,
+            email: userEmail,
+            username: userName,
+            password: passWord,
+          },
+        ])
+        .select('id');
 
       if (error) throw error;
 
-        const userId = data[0].id;
+      const userId = data[0].id;
+
+      // Insert initial coins into the coins table
+      const { data: coinsData, error: coinsError } = await supabase
+        .from('coins')
+        .insert([{ user_id: userId, coin_count: 100 }]); // Default coin count to 100
+
+      if (coinsError) throw coinsError;
 
       await addRandomPokemonsToOwned(userId);
 
-
       successMessage.set('Registration successful!');
+
+      window.location.href = '/index.html'; // Redirect after successful registration
     } catch (error) {
       errorMessage.set(error.message);
     }
@@ -71,6 +84,13 @@
       bind:value={$lastName}
       placeholder="Last Name"
     />
+  </div>
+
+  <div>
+    <label for="email"
+      >&nbsp;&nbsp;&nbsp;Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label
+    >
+    <input type="email" id="email" bind:value={$email} placeholder="Email" />
   </div>
 
   <div>

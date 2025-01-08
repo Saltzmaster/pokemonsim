@@ -128,23 +128,30 @@ export function getLocalStorageId() {
 
 
 export async function getCoins() {
-  try{ 
-
+  try {
     const userId = getLocalStorageId();
 
-    const {data, error} = await supabase
-    .from('users')
-    .select('coins')
-    .eq('id', userId)
-    .single();
+    if (!userId) {
+      console.error('User ID not found in local storage');
+      return 0; // Return 0 if no user is logged in
+    }
 
-    return data.coins
+    const { data, error } = await supabase
+      .from('users')
+      .select('coins')
+      .eq('id', userId)
+      .single();
 
+    if (error) {
+      console.error('Error fetching coins:', error);
+      return 0; // Return 0 if there's an error fetching the data
+    }
+
+    return data.coins; // Return the coins if successful
   } catch (error) {
-    console.error('Error fething Pokemon: ', error.message)
-    
+    console.error('Error in getCoins:', error);
+    return 0; // Return 0 if there's any error
   }
-
 }
 
 export async function feed(pokemonId) {
